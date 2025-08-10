@@ -43,7 +43,7 @@ db = client[os.environ['DB_NAME']]
 STATIC_DIR = ROOT_DIR / "static"
 
 # Mount static assets (JS/CSS)
-app.mount("/static", StaticFiles(directory=STATIC_DIR / "static"), name="static")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 # Serve index.html at root
 @app.get("/")
