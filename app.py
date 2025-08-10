@@ -19,16 +19,18 @@ import tempfile
 import os
 import time
 
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from motor.motor_asyncio import AsyncIOMotorClient
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 
-# Create the FastAPI app first
+# Create the FastAPI app
 app = FastAPI()
 
-
-
+# Load environment variables
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
@@ -37,20 +39,18 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# Create the main app without a prefix
-# Define paths
-ROOT_DIR = Path(__file__).parent
+# Define static directory (compiled React build)
 STATIC_DIR = ROOT_DIR / "static"
 
-# Mount static files at /static (for js/css)
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+# Mount static assets (JS/CSS)
+app.mount("/static", StaticFiles(directory=STATIC_DIR / "static"), name="static")
 
 # Serve index.html at root
 @app.get("/")
 async def serve_index():
     return FileResponse(STATIC_DIR / "index.html")
 
-# Catch-all for client-side routing (optional)
+# Catch-all for React client-side routing
 @app.get("/{full_path:path}")
 async def serve_static_or_index(full_path: str):
     file_path = STATIC_DIR / full_path
@@ -58,10 +58,10 @@ async def serve_static_or_index(full_path: str):
         return FileResponse(file_path)
     return FileResponse(STATIC_DIR / "index.html")
 
-
-
-# Create a router with the /api prefix
+# Mount API router
 api_router = APIRouter(prefix="/api")
+# Add your API routes here...
+app.include_router(api_router)
 
 # Mumbai Indians 2025 squad
 MI_PLAYERS = [
