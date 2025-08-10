@@ -35,20 +35,26 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
-app = FastAPI()
-
-
+# Define paths
 ROOT_DIR = Path(__file__).parent
 STATIC_DIR = ROOT_DIR / "static"
 
-app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
+# Mount static files at /static (for js/css)
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
+# Serve index.html at root
+@app.get("/")
+async def serve_index():
+    return FileResponse(STATIC_DIR / "index.html")
+
+# Catch-all for client-side routing (optional)
 @app.get("/{full_path:path}")
 async def serve_static_or_index(full_path: str):
     file_path = STATIC_DIR / full_path
     if file_path.exists():
         return FileResponse(file_path)
     return FileResponse(STATIC_DIR / "index.html")
+
 
 
 # Create a router with the /api prefix
