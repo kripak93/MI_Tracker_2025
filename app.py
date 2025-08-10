@@ -16,6 +16,8 @@ from datetime import datetime, timedelta
 import asyncio
 from io import BytesIO
 import tempfile
+import os
+import time
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -35,7 +37,6 @@ db = client[os.environ['DB_NAME']]
 # Create the main app without a prefix
 app = FastAPI()
 
-app = FastAPI()
 
 ROOT_DIR = Path(__file__).parent
 STATIC_DIR = ROOT_DIR / "static"
