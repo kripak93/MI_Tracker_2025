@@ -24,6 +24,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pathlib import Path
 
+# Create the FastAPI app first
+app = FastAPI()
+
 
 
 ROOT_DIR = Path(__file__).parent
