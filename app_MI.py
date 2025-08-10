@@ -17,6 +17,13 @@ import asyncio
 from io import BytesIO
 import tempfile
 
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from pathlib import Path
+
+
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
@@ -27,6 +34,21 @@ db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
 app = FastAPI()
+
+app = FastAPI()
+
+ROOT_DIR = Path(__file__).parent
+STATIC_DIR = ROOT_DIR / "static"
+
+app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
+
+@app.get("/{full_path:path}")
+async def serve_static_or_index(full_path: str):
+    file_path = STATIC_DIR / full_path
+    if file_path.exists():
+        return FileResponse(file_path)
+    return FileResponse(STATIC_DIR / "index.html")
+
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
